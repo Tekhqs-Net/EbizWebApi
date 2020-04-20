@@ -1,0 +1,63 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using WebApi.Models.CustomerHelper;
+using WebApi.Models.EbizModelHelper;
+
+namespace WebApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CustomerController : ControllerBase
+    {
+        // Get Customer
+        [Route("[action]")]
+        [HttpPost]
+        public async Task<IActionResult> GetCustomer([FromBody]CustomerDetailModel model)
+        {
+            try
+            {
+                dynamic response = await new CustomerManager().GetCustomerDetails(model);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        // Search Customer
+        [Route("[action]")]
+        [HttpPost]
+        public async Task<IActionResult> SearchAllCustomers([FromBody]CustomerDetailModel model)
+        {
+            try
+            {
+                dynamic response = await new CustomerManager().SearchCustomerDetails(model);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        // Search Customer with pagination
+        [Route("[action]")]
+        [HttpPost]
+        public async Task<IActionResult> SearchCustomersWithPagination([FromBody]CustomerDetailModel model)
+        {
+            try
+            {
+                dynamic response = await new CustomerManager().SearchCustomersWithPagination(model);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+    }
+}
