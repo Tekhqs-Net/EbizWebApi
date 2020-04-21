@@ -68,7 +68,7 @@ namespace WebApi.Models.EmailHelper
                         customer.CustomerId = model.ebizWebForm.CustomerId;
                         customer.CompanyName = model.ebizWebForm.CustFullName;
                         //model.customer
-                        response.Customer = await new CustomerManager().AddNewCustomer(customer);
+                        response.Customer = await new CustomerManager().AddNewCustomer(customer, token);
                         model.ebizWebForm.CustomerId = response.Customer.CustomerId;
                         model.ebizWebForm.CustFullName = model.customer.FirstName + " " + model.customer.LastName;
                         model.customer.CustomerInternalId = response.Customer.CustomerInternalId;
@@ -146,13 +146,14 @@ namespace WebApi.Models.EmailHelper
                         customer.CustomerId = model.ebizWebForm.CustomerId;
                         customer.CompanyName = model.ebizWebForm.CustFullName;
                         //model.customer
-                        response.Customer = await new CustomerManager().AddNewCustomer(customer);
+                        response.Customer = await new CustomerManager().AddNewCustomer(customer, token);
                         model.ebizWebForm.CustomerId = response.Customer.CustomerId;
                         model.ebizWebForm.CustFullName = model.customer.FirstName + " " + model.customer.LastName;
                         model.customer.CustomerInternalId = response.Customer.CustomerInternalId;
                     }
                 }
             }
+            model.ebizWebForm.EmailAddress = "abutt@tekhqs.com";
             model.ebizWebForm.SendEmailToCustomer = true;
             var data = await client.GetEbizWebFormURLAsync(token, model.ebizWebForm);
             response.EbizWebFormLink = data;

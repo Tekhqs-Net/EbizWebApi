@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using WebApi.Models.CustomerHelper;
 using WebApi.Models.DynamicResponse;
 using WebApi.Models.EbizModelHelper;
+using WebApi.Models.InvoiceHelper;
+using WebApi.Models.OrderHelper;
 using WebApi.Models.PaymentHelper;
 
 namespace WebApi.Models.TransactionHelper
@@ -69,7 +71,10 @@ namespace WebApi.Models.TransactionHelper
             Response response = new Response();
             SecurityToken token = await GetSecurityToken();
             var client = new PaymentGateway.IeBizServiceClient();
+         
             var result = await client.runTransactionAsync(token, model.transactionRequest);
+          
+
             if (result.ResultCode == "A")
             {
                 response.TransResponse = result;
@@ -90,13 +95,15 @@ namespace WebApi.Models.TransactionHelper
             //if paymentmethodid = "" then add and save card details
             // paymentmethodid from model 
             string custIntlId = "";
+            string invoiceIntlId = "";
+            string orderIntlId = "";
             SecurityToken token = await GetSecurityToken();
             var client = new PaymentGateway.IeBizServiceClient();
-            if (string.IsNullOrWhiteSpace(model.customer?.CustomerInternalId))
+            if (!string.IsNullOrEmpty(model.customer?.CustomerId))
             {
                 try
                 {
-                    model.customer = await client.GetCustomerAsync(token, model.customer.CustomerId, model.customer.CustomerInternalId);
+                    model.customer = await client.GetCustomerAsync(token, model.customer.CustomerId, "");
                     //getCustomer( by id customer?.CustomerId
                     //assigne to custIntlId = customerInternalID
                     custIntlId = model.customer.CustomerInternalId;
@@ -109,12 +116,10 @@ namespace WebApi.Models.TransactionHelper
                     }
                 }
             }
-
             if (string.IsNullOrEmpty(custIntlId.ToString()) && model.customer != null)
             {
                 //Add customer
-                // custIntlId = customerIntlId
-                response.CustomerResponse = await new CustomerManager().AddNewCustomer(model.customer);
+                response.CustomerResponse = await new CustomerManager().AddNewCustomer(model.customer, token);
                 //get customertoken
                 model.customer.CustomerToken = await client.GetCustomerTokenAsync(token, model.customer.CustomerId, model.customer.CustomerInternalId);
                 custIntlId = response.CustomerResponse.CustomerInternalId;
@@ -136,11 +141,89 @@ namespace WebApi.Models.TransactionHelper
                     var status = await new PaymentManager().SetDefaultPaymentMethodProfile(obj);
                 }
             }
+            if (!string.IsNullOrEmpty(model.customerTransaction?.Details?.Invoice) && model.isOrder == false)
+            {
+                try
+                {
+                    model.invoice = await client.GetInvoiceAsync(token, model.customer.CustomerId, "",model.customerTransaction.Details.Invoice,"");
+                    invoiceIntlId = model.invoice.InvoiceInternalId;
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.ToString() == "Not Found")
+                    {
+                        invoiceIntlId = "";
+                    }
+                }
+            }
+            if (string.IsNullOrEmpty(invoiceIntlId.ToString()) && model.invoice != null && model.isOrder == false)
+            {
+                //Add new Invoice
+                response.Invoice = await new InvoiceManager().AddInvoices(model.invoice,token);
+                invoiceIntlId = response.Invoice.InvoiceInternalId;
+            }
+            if (!string.IsNullOrEmpty(model.customerTransaction?.Details?.OrderID) && model.isOrder == true)
+            {
+                try
+                {
+                    model.salesOrder = await client.GetSalesOrderAsync(token, model.customer.CustomerId, model.customer.CustomerInternalId, model.customerTransaction.Details.OrderID, "");
+                    orderIntlId = model.salesOrder.SalesOrderInternalId;
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.ToString() == "Not Found")
+                    {
+                        orderIntlId = "";
+                    }
+                }
+            }
+            if (string.IsNullOrEmpty(orderIntlId.ToString()) && model.salesOrder != null && model.isOrder == true)
+            {
+                //Add new Invoice
+                response.SalesOrder = await new OrderManager().AddSalesOrder(token, model.salesOrder);
+                orderIntlId = response.SalesOrder.SalesOrderInternalId;
+            }
 
             //Call Run Customer transaction
             ///
             //end
             var result = await client.runCustomerTransactionAsync(token, model.customer.CustomerToken, model.paymentMethod, model.customerTransaction);
+            if (model.isOrder == true)
+            {
+                if (!string.IsNullOrEmpty(model.customerTransaction.Details.OrderID))
+                {
+                    ApplicationTransactionRequest obj = new ApplicationTransactionRequest();
+                    {
+                        obj.CustomerInternalId = custIntlId;
+                        obj.LinkedToInternalId = orderIntlId;//sales order internal id or invoice internal id 
+                        obj.LinkedToTypeId = model.customerTransaction.Details.OrderID;//sales order number or invoice number
+                        obj.TransactionId = result.RefNum;
+                        obj.TransactionDate = DateTime.Now.ToString();
+                        obj.TransactionTypeId = "AuthOnly";
+                        obj.SoftwareId = ".NetApi";
+                    }
+                    response.AppTransResponse = await client.AddApplicationTransactionAsync(token, obj);
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(model.customerTransaction.Details.Invoice))
+                {
+                    ApplicationTransactionRequest obj = new ApplicationTransactionRequest();
+                    {
+                        obj.CustomerInternalId = custIntlId;
+                        obj.LinkedToInternalId = invoiceIntlId;//sales order internal id or invoice internal id 
+                        obj.LinkedToTypeId = model.customerTransaction.Details.Invoice;//sales order number or invoice number
+                        obj.TransactionId = result.RefNum;
+                        obj.TransactionDate = DateTime.Now.ToString();
+                        obj.TransactionTypeId = "AuthOnly";
+                        obj.SoftwareId = ".NetApi";
+                    }
+                    response.AppTransResponse = await client.AddApplicationTransactionAsync(token, obj);
+                }
+            }
+                
+        
             if (result.ResultCode == "A")
             {
                 response.TransResponse = result;

@@ -32,6 +32,11 @@ namespace WebApi.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(model.scheduledPaymentInternalId) && string.IsNullOrEmpty(model.statusId.ToString()))
+                {
+                    string msg = "scheduledPaymentInternalId & statusId  should not be null or empty";
+                    return BadRequest(msg);
+                }
                 dynamic response = await new RecurringManager().ModifyScheduledRecurringPaymentStatus(model);
                 return Ok(response);
             }
@@ -46,6 +51,11 @@ namespace WebApi.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(model.scheduledPaymentInternalId) && string.IsNullOrEmpty(model.statusId.ToString()))
+                {
+                    string msg = "scheduledPaymentInternalId & statusId  should not be null or empty";
+                    return BadRequest(msg);
+                }
                 dynamic response = await new RecurringManager().DeleteRecurringPayments(model);
                 return Ok(response);
             }

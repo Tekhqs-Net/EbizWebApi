@@ -14,6 +14,9 @@ namespace WebApi.Models.TransactionHelper
         public TransactionRequestObject transactionRequest { get; set; }
         public Customer customer { get; set; }
         public PaymentMethodProfile paymentMethodProfile { get; set; }
+        public Invoice invoice { get; set; }
+        public SalesOrder salesOrder { get; set; }
+        public bool isOrder { get; set; }
         public SecurityToken securityToken { get; set; }
     }
 }

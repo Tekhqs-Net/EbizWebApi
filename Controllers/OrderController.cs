@@ -20,6 +20,11 @@ namespace WebApi.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(model.salesOrderNo))
+                {
+                    string msg = "salesOrderNo should not be null or empty";
+                    return BadRequest(msg);
+                }
                 dynamic response = await new OrderManager().GetOrderDetails(model);
                 return Ok(response);
             }
@@ -50,6 +55,11 @@ namespace WebApi.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(model.pageno.ToString()) && string.IsNullOrEmpty(model.pagesize.ToString()))
+                {
+                    string msg = "pageNo & pageSize should not be null or empty";
+                    return BadRequest(msg);
+                }
                 dynamic response = await new OrderManager().SearchOrdersWithPagination(model);
                 return Ok(response);
             }

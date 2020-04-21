@@ -39,6 +39,11 @@ namespace WebApi.Controllers
             try
             {
                 Response response = new Response();
+                if (string.IsNullOrEmpty(model.paymentInternalId))
+                {
+                    string msg = "paymentInternalId should not be null or empty";
+                    return BadRequest(msg);
+                }
                 response.TransResponse = await new PaymentManager().MarkPaymentAsApplied(model);
                 return Ok(response);
             }
@@ -54,6 +59,11 @@ namespace WebApi.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(model.paymentMethod))
+                {
+                    string msg = "paymentMethod should not be null or empty";
+                    return BadRequest(msg);
+                }
                 var response = await new PaymentManager().DeletePaymentMethodProfile(model);
                 return Ok(response);
             }
@@ -70,6 +80,11 @@ namespace WebApi.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(model.paymentMethod))
+                {
+                    string msg = "paymentMethod should not be null or empty";
+                    return BadRequest(msg);
+                }
                 var response = await new PaymentManager().SetDefaultPaymentMethodProfile(model);
                 return Ok(response);
             }
@@ -86,6 +101,11 @@ namespace WebApi.Controllers
             try
             {
                 Response response = new Response();
+                if (model.paymentMethodProfile == null)
+                {
+                    string msg = "paymentMethodProfile should not be null or empty";
+                    return BadRequest(msg);
+                }
                 response.TransResponse = await new PaymentManager().UpdatePaymentMethodProfile(model);
                 return Ok(response);
             }

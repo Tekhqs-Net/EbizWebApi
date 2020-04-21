@@ -38,6 +38,11 @@ namespace WebApi.Controllers
                 details.Amount = 0.5;
                 //details.Description = "Example QuickSale";
                 //details.Invoice = "1286";
+                if (model.transactionRequest?.CreditCardData == null)
+                {
+                    string msg = "payment details should not be empty";
+                    return BadRequest(msg);
+                }
                 model.transactionRequest.Details = details;
                 dynamic response = await new TransactionManager().AVSPaymentResponse(model);
                 return Ok(response);
@@ -63,6 +68,11 @@ namespace WebApi.Controllers
                 card.AvsStreet = "123 Main st.";
                 card.AvsZip = "90046";
                 model.transactionRequest.CreditCardData = card;
+                if (model.transactionRequest?.CreditCardData == null)
+                {
+                    string msg = "payment details should not be empty";
+                    return BadRequest(msg);
+                }
                 model.transactionRequest.CustReceipt = true;
                 model.transactionRequest.CustReceiptName = "Aaadam Smith";
                 model.transactionRequest.Command = "AuthOnly";
@@ -71,6 +81,7 @@ namespace WebApi.Controllers
                 details.Amount = 2;
                 details.Description = "Example QuickSale";
                 details.Invoice = "1286";
+                details.OrderID = "123";
                 model.transactionRequest.Details = details;
                 string caseSwitch = model.transactionRequest.Command;
                 response.TransResponse = await new TransactionManager().NewTransaction(model);
@@ -90,16 +101,36 @@ namespace WebApi.Controllers
             try
             {
                 Response response = new Response();
+                if (model.customer == null)
+                {
+                    string msg = "customer info is required to save cc info.";
+                    return BadRequest(msg);
+                }
+                // test salesOrder object
+                SalesOrder salesOrder = new SalesOrder();
+                salesOrder.CustomerId = "409";
+                salesOrder.Amount = 20;
+                salesOrder.SalesOrderNumber = "so89899865";
+                model.salesOrder = salesOrder;
+                // test invoice object
+                Invoice invoice = new Invoice();
+                invoice.AmountDue = 200;
+                invoice.CustomerId = "409";
+                invoice.InvoiceNumber = "1286";
+                model.invoice = invoice;
                 TransactionDetail details = new TransactionDetail();
                 details.Amount = 2;
                 details.Description = "Example QuickSale";
+                model.isOrder = false;
                 details.Invoice = "1286";
+                details.OrderID = "so89899865";
                 model.customerTransaction.Details = details;
                 model.customerTransaction.Software = ".NetApi";
                 model.customerTransaction.CustReceipt = true;
                 model.customerTransaction.CustReceiptName = "Aaadam Smith";
                 model.customerTransaction.Command = "AuthOnly";
                 model.customerTransaction.Software = model.customer?.SoftwareId;
+                // test PaymentMethodProfile object
                 PaymentMethodProfile payMethod = new PaymentMethodProfile();
                 payMethod.CardExpiration = "0922";
                 payMethod.CardNumber = "4000100511112229";
@@ -123,6 +154,11 @@ namespace WebApi.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(model.transactionRefNum))
+                {
+                    string msg = "transactionRefNum should not be empty.";
+                    return BadRequest(msg);
+                }
                 dynamic response = await new TransactionManager().GetTransactionDetails(model);
                 return Ok(response);
             }
@@ -153,6 +189,11 @@ namespace WebApi.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(model.pageno.ToString()) && string.IsNullOrEmpty(model.pagesize.ToString()))
+                {
+                    string msg = "pageNo & pageSize should not be null or empty";
+                    return BadRequest(msg);
+                }
                 var response = await new TransactionManager().SearchTransactionWithPagination(model);
                 return Ok(response);
             }

@@ -57,7 +57,11 @@ namespace WebApi.Controllers
         {
             try
             {
-
+                if (string.IsNullOrEmpty(model.paymentInternalId))
+                {
+                    string msg = "paymentInternalId should not be null or empty";
+                    return BadRequest(msg);
+                }
                 dynamic response = await new EmailManager().MarkEbizWebFormPaymentAsApplied(model);
                 return Ok(response);
             }
@@ -72,7 +76,11 @@ namespace WebApi.Controllers
         {
             try
             {
-
+                if (string.IsNullOrEmpty(model.paymentInternalId))
+                {
+                    string msg = "paymentInternalId should not be null or empty";
+                    return BadRequest(msg);
+                }
                 dynamic response = await new EmailManager().DeleteEBizWebFormPayment(model);
                 return Ok(response);
             }
@@ -102,7 +110,11 @@ namespace WebApi.Controllers
         {
             try
             {
-
+                if (string.IsNullOrEmpty(model.paymentInternalId))
+                {
+                    string msg = "paymentInternalId should not be null or empty";
+                    return BadRequest(msg);
+                }
                 dynamic response = await new EmailManager().ResendEbizWebFormEmail(model);
                 return Ok(response);
             }

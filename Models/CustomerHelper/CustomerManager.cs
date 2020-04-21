@@ -23,12 +23,21 @@ namespace WebApi.Models.CustomerHelper
             return securityToken;
         }
         //Add New Customer
-        public async Task<dynamic> AddNewCustomer(Customer customer)
+        public async Task<dynamic> AddNewCustomer(Customer customer, SecurityToken securityToken)
         {
             Response response = new Response();
             SecurityToken token = await GetSecurityToken();
             var client = new PaymentGateway.IeBizServiceClient();
             response.CustomerResponse = await client.AddCustomerAsync(token, customer);
+            return response.CustomerResponse;
+        }
+        //Add New Customer
+        public async Task<dynamic> UpdateCustomer(Customer customer, SecurityToken securityToken)
+        {
+            Response response = new Response();
+            SecurityToken token = await GetSecurityToken();
+            var client = new PaymentGateway.IeBizServiceClient();
+            response.CustomerResponse = await client.UpdateCustomerAsync(token, customer, customer.CustomerId, customer.CustomerInternalId);
             return response.CustomerResponse;
         }
 

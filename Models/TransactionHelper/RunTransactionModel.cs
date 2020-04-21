@@ -9,6 +9,7 @@ namespace WebApi.Models.TransactionHelper
     public class RunTransactionModel
     {
         public TransactionRequestObject transactionRequest { get; set; }
+        public ApplicationTransactionRequest applicationTransactionRequest { get; set; }
         public SecurityToken securityToken { get; set; }
     }
 }

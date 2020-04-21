@@ -21,6 +21,20 @@ namespace WebApi.Models.OrderHelper
             });
             return securityToken;
         }
+        //Add Order
+        public async Task<dynamic> AddSalesOrder(SecurityToken token, SalesOrder order)
+        {
+            var client = new PaymentGateway.IeBizServiceClient();
+            var data = await client.AddSalesOrderAsync(token, order);
+            return data;
+        }
+        //Update Order
+        public async Task<dynamic> UpdateSalesOrder(SecurityToken token, SalesOrder order)
+        {
+            var client = new PaymentGateway.IeBizServiceClient();
+            var data = await client.UpdateSalesOrderAsync(token, order,order.CustomerId,order.SubCustomerId,order.SalesOrderNumber,order.SalesOrderInternalId);
+            return data;
+        }
         //Get Order
         public async Task<dynamic> GetOrderDetails(OrderDetailModel model)
         {

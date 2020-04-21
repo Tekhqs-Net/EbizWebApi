@@ -8,6 +8,7 @@ namespace WebApi.Models.InvoiceHelper
 {
     public class InvoiceDetailModel
     {
+        public Invoice invoice { get; set; }
         public int pageno { get; set; }
         public int pagesize { get; set; }
         public string customerId { get; set; }
