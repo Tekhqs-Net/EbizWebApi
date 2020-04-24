@@ -9,6 +9,8 @@ namespace WebApi.Models.SyncHelper
     {
         public List<SyncCustomerReponse> customerReponses { get; set; }
         public List<SyncOrderReponse> orderReponses { get; set; }
+        public List<SyncInvoiceReponse> invoiceReponses { get; set; }
+        public List<SyncItemReponse> syncItemReponses { get; set; }
     }
     public class SyncCustomerReponse
     {
@@ -21,6 +23,20 @@ namespace WebApi.Models.SyncHelper
     {
         public string OrderNo { get; set; }
         public string OrderInternalId { get; set; }
+        public string Status { get; set; }
+        public string Message { get; set; }
+    }
+    public class SyncInvoiceReponse
+    {
+        public string InvoiceNo { get; set; }
+        public string InvoiceInternalId { get; set; }
+        public string Status { get; set; }
+        public string Message { get; set; }
+    }
+    public class SyncItemReponse
+    {
+        public string ItemId { get; set; }
+        public string ItemInternalId { get; set; }
         public string Status { get; set; }
         public string Message { get; set; }
     }

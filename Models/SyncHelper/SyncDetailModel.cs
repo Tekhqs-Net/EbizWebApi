@@ -11,7 +11,7 @@ namespace WebApi.Models.SyncHelper
         public List<Customer> customers { get; set; }
         public List<SalesOrder> salesOrders { get; set; }
         public List<Invoice> invoices { get; set; }
-        public List<Item> items { get; set; }
+        public List<ItemDetails> items { get; set; }
         public SecurityToken securityToken { get; set; }
     }
 }

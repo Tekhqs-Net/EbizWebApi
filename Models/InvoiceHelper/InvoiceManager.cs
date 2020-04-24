@@ -29,6 +29,14 @@ namespace WebApi.Models.InvoiceHelper
             var data = await client.AddInvoiceAsync(token, invoice);
             return data;
         }
+        //update Invoice
+        public async Task<dynamic> UpdateInvoices(Invoice invoice, SecurityToken token)
+        {
+            SecurityToken stoken = await GetSecurityToken();
+            var client = new PaymentGateway.IeBizServiceClient();
+            var data = await client.UpdateInvoiceAsync(stoken, invoice,invoice.CustomerId,"",invoice.InvoiceNumber,"");
+            return data;
+        }
         //Get Invoice
         public async Task<dynamic> GetInvoiceDetails(InvoiceDetailModel model)
         {

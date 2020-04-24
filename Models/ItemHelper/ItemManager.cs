@@ -29,6 +29,22 @@ namespace WebApi.Models.ItemHelper
             var data = await client.SearchItemsAsync(token, model.itemInternalId, model.itemId, model.searchFilters, model.start, model.limit, model.sort);
             return data;
         }
+        //Add Item
+        public async Task<dynamic> AddItem(SecurityToken tokens, ItemDetails item)
+        {
+            SecurityToken token = await GetSecurityToken();
+            var client = new PaymentGateway.IeBizServiceClient();
+            var data = await client.AddItemAsync(token,item);
+            return data;
+        }
+        //Update Item
+        public async Task<dynamic> UpdateItemDetails(SecurityToken tokens, ItemDetails itemDetails)
+        {
+            SecurityToken token = await GetSecurityToken();
+            var client = new PaymentGateway.IeBizServiceClient();
+            var data = await client.UpdateItemAsync(token, itemDetails, itemDetails.ItemInternalId, itemDetails.ItemId);
+            return data;
+        }
         //Search Items
         public async Task<dynamic> SearchAllItems(ItemDetailModel model)
         {
@@ -60,5 +76,6 @@ namespace WebApi.Models.ItemHelper
             var data = await client.SearchItemsAsync(token, model.itemInternalId, model.itemId, model.searchFilters, model.start, model.limit, model.sort);
             return data;
         }
+   
     }
 }
